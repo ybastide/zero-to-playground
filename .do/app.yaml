@@ -45,4 +45,4 @@ databases:
         num_nodes: 1
         size: db-s-dev-database
         # Postgres version - using the latest here
-        version: "13"
+        version: "12"
