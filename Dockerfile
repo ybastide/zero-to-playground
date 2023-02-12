@@ -14,7 +14,7 @@ COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 
 FROM rust:bookworm as builder
-RUN apt-get update && apt-get install -y mold #clang
+RUN apt-get update && apt-get install -y mold clang
 
 WORKDIR app
 COPY . .
