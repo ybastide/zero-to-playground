@@ -1,4 +1,7 @@
-FROM rust:bookworm as planner
+FROM rust:bookworm as base
+RUN apt-get update && apt-get install -y mold clang
+
+FROM base as planner
 LABEL authors="zeb"
 WORKDIR app
 # We only pay the installation cost once,
@@ -7,14 +10,13 @@ RUN cargo install cargo-chef
 COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
-FROM rust:bookworm as cacher
+FROM base as cacher
 WORKDIR app
 RUN cargo install cargo-chef
 COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 
-FROM rust:bookworm as builder
-RUN apt-get update && apt-get install -y mold clang
+FROM base as builder
 
 WORKDIR app
 COPY . .
