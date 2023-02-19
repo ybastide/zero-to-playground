@@ -1,4 +1,6 @@
-use utils::utils::spawn_app;
+use crate::utils::utils::spawn_app;
+
+mod utils;
 
 #[tokio::test]
 async fn subscribe_returns_a_20x_for_valid_form_data() {
@@ -48,6 +50,34 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
             // Additional customised error message on test failure
             "The API did not fail with 400 Bad Request when the payload was {}.",
             error_message
+        );
+    }
+}
+
+#[tokio::test]
+async fn subscribe_returns_a_200_when_fields_are_present_but_empty() {
+    // Arrange
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+    let test_cases = vec![
+        ("name=&email=ursula_le_guin%40gmail.com", "empty name"),
+        ("name=Ursula&email=", "empty email"),
+        ("name=Ursula&email=definitely-not-an-email", "invalid email"),
+    ];
+
+    for (body, description) in test_cases {
+        let response = client
+            .post(&format!("{}/subscriptions", &app.address))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(body)
+            .send()
+            .await
+            .expect("Failed to execute request.");
+        assert_eq!(
+            400,
+            response.status(),
+            "The API did not return a 400 Bad Request when the payload was {:?}.",
+            description
         );
     }
 }
