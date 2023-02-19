@@ -35,7 +35,7 @@ services:
                 value: ${newsletter.PORT}
             -   key: APP_DATABASE__DATABASE_NAME
                 scope: RUN_TIME
-                value: ${newsletter.DATABASE
+                value: ${newsletter.DATABASE}
 
 databases:
     -   engine: PG
